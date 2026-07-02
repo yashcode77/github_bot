@@ -6,3 +6,169 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum EventStatus {
+  RECEIVED
+  PROCESSING
+  PROCESSED
+  FAILED
+  SKIPPED
+}
+
+enum ActionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum ActionType {
+  ADD_LABEL
+  ADD_COMMENT
+  SLACK_NOTIFY
+}
+
+enum AiPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model User {
+  id              String   @id @default(cuid())
+  githubId        Int      @unique
+  githubLogin     String
+  displayName     String?
+  avatarUrl       String?
+  encryptedToken  String
+  tokenIv         String
+  slackWebhookUrl String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  repositories  Repository[]
+  rules         Rule[]
+  refreshTokens RefreshToken[]
+
+  @@index([githubLogin])
+}
+
+model RefreshToken {
+  id         String    @id @default(cuid())
+  userId     String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  replacedBy String?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Repository {
+  id             String    @id @default(cuid())
+  userId         String
+  githubRepoId   Int       @unique
+  owner          String
+  name           String
+  fullName       String
+  isPrivate      Boolean   @default(false)
+  webhookId      Int?
+  isActive       Boolean   @default(true)
+  connectedAt    DateTime  @default(now())
+  disconnectedAt DateTime?
+
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rules      Rule[]
+  events     GitHubEvent[]
+  botActions BotAction[]
+
+  @@unique([userId, owner, name])
+  @@index([userId, isActive])
+}
+
+model Rule {
+  id           String    @id @default(cuid())
+  userId       String
+  repositoryId String
+  name         String
+  description  String?
+  isEnabled    Boolean   @default(true)
+  eventType    String
+  eventAction  String?
+  conditions   Json      @default("[]")
+  actions      Json
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  repository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  matches    RuleMatch[]
+
+  @@index([repositoryId, isEnabled, eventType])
+  @@index([repositoryId, deletedAt])
+}
+
+model GitHubEvent {
+  id                  String      @id @default(cuid())
+  repositoryId        String
+  deliveryId          String      @unique
+  eventType           String
+  action              String?
+  githubSender        String?
+  payload             Json
+  status              EventStatus @default(RECEIVED)
+  errorMessage        String?
+  processingStartedAt DateTime?
+  processedAt         DateTime?
+  aiSummary           String?     @db.Text
+  aiPriority          AiPriority?
+  aiSuggestedLabel    String?
+  receivedAt          DateTime    @default(now())
+
+  repository Repository  @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  matches    RuleMatch[]
+  botActions BotAction[]
+
+  @@index([repositoryId, eventType])
+  @@index([repositoryId, receivedAt(sort: Desc)])
+  @@index([status])
+}
+
+model RuleMatch {
+  id        String   @id @default(cuid())
+  eventId   String
+  ruleId    String
+  matchedAt DateTime @default(now())
+
+  event      GitHubEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  rule       Rule        @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  botActions BotAction[]
+
+  @@unique([eventId, ruleId])
+}
+
+model BotAction {
+  id              String       @id @default(cuid())
+  eventId         String
+  ruleMatchId     String?
+  repositoryId    String
+  actionType      ActionType
+  status          ActionStatus @default(PENDING)
+  requestPayload  Json?
+  responsePayload Json?
+  errorMessage    String?
+  createdAt       DateTime     @default(now())
+  completedAt     DateTime?
+
+  event      GitHubEvent  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  ruleMatch  RuleMatch?   @relation(fields: [ruleMatchId], references: [id], onDelete: SetNull)
+  repository Repository   @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  @@index([repositoryId, createdAt(sort: Desc)])
+  @@index([status])
+}

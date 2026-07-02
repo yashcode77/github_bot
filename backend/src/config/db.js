@@ -1,12 +1,14 @@
 import prisma from "./prisma.js";
+import { logger } from "./logger.js";
 
 export async function connectToDB() {
-  try {
-    await prisma.$connect();
-
-    console.log("PostgreSQL connection successfully established");
-  } catch (err) {
-    console.error("PostgreSQL connection error!", err);
-    process.exit(1);
-  }
+  await prisma.$connect();
+  logger.info("PostgreSQL connection established");
 }
+
+export async function disconnectFromDB() {
+  await prisma.$disconnect();
+  logger.info("PostgreSQL connection closed");
+}
+
+export { prisma };
