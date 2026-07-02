@@ -15,6 +15,12 @@ export const repositoryRepository = {
     return prisma.repository.findUnique({ where: { githubRepoId } });
   },
 
+  findActiveByGithubRepoId(githubRepoId) {
+    return prisma.repository.findFirst({
+      where: { githubRepoId, isActive: true },
+    });
+  },
+
   findByUserAndName(userId, owner, name) {
     return prisma.repository.findUnique({
       where: {

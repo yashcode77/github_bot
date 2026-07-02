@@ -122,7 +122,7 @@ export const githubService = {
         active: true,
         events: WEBHOOK_EVENTS,
         config: {
-          url: `${env.BACKEND_URL}/webhooks/github`,
+          url: `${env.BACKEND_URL}/api/webhooks/github`,
           content_type: "json",
           secret: env.GITHUB_WEBHOOK_SECRET,
           insecure_ssl: "0",

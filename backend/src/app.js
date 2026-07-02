@@ -8,6 +8,7 @@ import { env } from "./config/env.js";
 import passport from "./config/passport.js";
 import authRoutes from "./routes/auth.routes.js";
 import repositoryRoutes from "./routes/repository.routes.js";
+import webhookRoutes from "./routes/webhook.routes.js";
 import {
   errorHandler,
   notFoundHandler,
@@ -32,6 +33,8 @@ app.use(
     credentials: true,
   }),
 );
+
+app.use("/api/webhooks", webhookRoutes);
 
 app.use(express.json());
 app.use(cookieParser());
