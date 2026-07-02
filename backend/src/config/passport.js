@@ -10,7 +10,7 @@ passport.use(
       clientID: env.GITHUB_CLIENT_ID,
       clientSecret: env.GITHUB_CLIENT_SECRET,
       callbackURL: env.GITHUB_CALLBACK_URL,
-      scope: ["read:user", "user:email", "repo"],
+      scope: ["read:user", "user:email", "repo", "admin:repo_hook"],
     },
     async (accessToken, _refreshToken, profile, done) => {
       try {

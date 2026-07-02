@@ -38,3 +38,9 @@ export class ForbiddenError extends AppError {
     super(message, 403, "FORBIDDEN");
   }
 }
+
+export class GitHubApiError extends AppError {
+  constructor(message = "GitHub API request failed", statusCode = 502) {
+    super(message, statusCode, "GITHUB_API_ERROR");
+  }
+}
