@@ -11,6 +11,7 @@ import repositoryRoutes from "./routes/repository.routes.js";
 import ruleRoutes from "./routes/rule.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
 import webhookRoutes from "./routes/webhook.routes.js";
+import settingsRoutes from "./routes/settings.routes.js";
 import {
   errorHandler,
   notFoundHandler,
@@ -65,6 +66,7 @@ app.use("/auth", authRoutes);
 app.use("/api/repositories", repositoryRoutes);
 app.use("/api/rules", ruleRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/settings", settingsRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

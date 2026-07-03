@@ -9,6 +9,7 @@ import RepositoriesPage from "@/pages/RepositoriesPage";
 import RulesPage from "@/pages/RulesPage";
 import EventsPage from "@/pages/EventsPage";
 import ActionsPage from "@/pages/ActionsPage";
+import SettingsPage from "@/pages/SettingsPage";
 
 function PublicRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -48,6 +49,7 @@ export default function AppRoutes() {
         <Route path="/rules" element={<RulesPage />} />
         <Route path="/events" element={<EventsPage />} />
         <Route path="/actions" element={<ActionsPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Route>
 
       <Route path="/" element={<Navigate to="/dashboard" replace />} />

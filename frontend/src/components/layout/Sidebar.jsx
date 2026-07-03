@@ -4,6 +4,7 @@ import {
   GitBranch,
   LayoutDashboard,
   ListChecks,
+  Settings,
   Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -16,6 +17,7 @@ const navItems = [
   { to: "/rules", label: "Rules", icon: ListChecks },
   { to: "/events", label: "Events", icon: Activity },
   { to: "/actions", label: "Actions", icon: Zap },
+  { to: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function Sidebar({ onNavigate }) {
