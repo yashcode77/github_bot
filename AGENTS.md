@@ -169,6 +169,21 @@ Optimize for clarity and maintainability.
 
 ---
 
+## Frontend Standards
+
+- React + Vite frontend
+- Use javascript and not typescript
+- Tailwind CSS is the primary styling solution
+- shadcn/ui is the component library
+- Prefer existing shadcn/ui components over creating custom UI primitives
+- Reuse existing components before creating new ones
+- Use Tailwind utility classes for styling
+- Maintain a consistent design system across the application
+- Use React Router for routing
+- Use Axios for API communication
+- Use Context API for authentication state
+- Keep components small and reusable
+
 ## Security Requirements
 
 These are mandatory.

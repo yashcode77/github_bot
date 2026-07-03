@@ -24,6 +24,11 @@ export function toPublicUser(user) {
 export const authService = {
   async findOrCreateFromGithub(profile, accessToken) {
     const { encryptedToken, tokenIv } = encryptToken(accessToken);
+    const githubId = Number(profile.id);
+
+    if (!Number.isInteger(githubId)) {
+      throw new Error(`Invalid GitHub user id: ${profile.id}`);
+    }
 
     const userData = {
       githubLogin: profile.username,
@@ -33,14 +38,14 @@ export const authService = {
       tokenIv,
     };
 
-    const existingUser = await userRepository.findByGithubId(profile.id);
+    const existingUser = await userRepository.findByGithubId(githubId);
 
     if (existingUser) {
       return userRepository.update(existingUser.id, userData);
     }
 
     return userRepository.create({
-      githubId: profile.id,
+      githubId,
       ...userData,
     });
   },

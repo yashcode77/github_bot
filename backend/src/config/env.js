@@ -21,7 +21,7 @@ const envSchema = z.object({
   SESSION_SECRET: z
     .string()
     .min(32, "SESSION_SECRET must be at least 32 characters"),
-  FRONTEND_URL: z.string().url().default("http://localhost:5173"),
+  FRONTEND_URL: z.string().url().default("http://localhost:5174"),
   BACKEND_URL: z.string().url("BACKEND_URL must be a valid URL"),
   GITHUB_WEBHOOK_SECRET: z
     .string()

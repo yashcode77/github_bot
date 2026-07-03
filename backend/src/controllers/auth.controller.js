@@ -17,7 +17,7 @@ export const authController = {
   async githubCallback(req, res, next) {
     passport.authenticate("github", { session: false }, async (err, user) => {
       if (err) {
-        next(err);
+        res.redirect(`${env.FRONTEND_URL}/login?error=auth_failed`);
         return;
       }
 
