@@ -8,8 +8,11 @@ const startServer = async () => {
   try {
     await connectToDB();
 
-    app.listen(env.PORT, () => {
-      logger.info(`Server running on http://localhost:${env.PORT}`);
+    const PORT = env.PORT;
+    
+    app.listen(PORT, '0.0.0.0', () => {
+      logger.info(`Server running on http://localhost:${PORT}`);
+      logger.info(`Server listening on all interfaces (0.0.0.0:${PORT}) - Ready for ngrok`);
     });
   } catch (error) {
     logger.fatal({ err: error }, "Failed to start server");

@@ -1,6 +1,6 @@
 import { env } from "../config/env.js";
 import { logger } from "../config/logger.js";
-import { GitHubApiError } from "../lib/errors.js";
+import { GitHubApiError, ValidationError } from "../lib/errors.js";
 
 const GITHUB_API = "https://api.github.com";
 const WEBHOOK_EVENTS = ["issues", "pull_request", "push"];
@@ -17,6 +17,32 @@ async function parseResponseBody(response) {
   } catch {
     return { message: text };
   }
+}
+
+function isLocalUrl(urlString) {
+  try {
+    const { hostname } = new URL(urlString);
+    return (
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "[::1]" ||
+      hostname.endsWith(".local")
+    );
+  } catch {
+    return false;
+  }
+}
+
+function formatGitHubErrorMessage(body) {
+  const hookErrors = body?.errors
+    ?.map((entry) => entry.message)
+    .filter(Boolean);
+
+  if (hookErrors?.length) {
+    return hookErrors.join("; ");
+  }
+
+  return body?.message || "GitHub API request failed";
 }
 
 function mapGitHubStatus(status) {
@@ -55,12 +81,13 @@ async function githubRequest(path, accessToken, options = {}) {
         status: response.status,
         path,
         githubMessage: body?.message,
+        githubErrors: body?.errors,
       },
       "GitHub API request failed",
     );
 
     throw new GitHubApiError(
-      body?.message || "GitHub API request failed",
+      formatGitHubErrorMessage(body),
       mapGitHubStatus(response.status),
     );
   }
@@ -115,6 +142,15 @@ export const githubService = {
   },
 
   async createWebhook(accessToken, owner, name) {
+    const webhookUrl = `${env.BACKEND_URL}/api/webhooks/github`;
+
+    if (isLocalUrl(env.BACKEND_URL)) {
+      throw new ValidationError(
+        "BACKEND_URL must be a publicly reachable URL to create GitHub webhooks. " +
+          "For local development, run ngrok (e.g. `ngrok http 3001`) and set BACKEND_URL to the ngrok HTTPS URL.",
+      );
+    }
+
     const hook = await githubRequest(`/repos/${owner}/${name}/hooks`, accessToken, {
       method: "POST",
       body: JSON.stringify({
@@ -122,7 +158,7 @@ export const githubService = {
         active: true,
         events: WEBHOOK_EVENTS,
         config: {
-          url: `${env.BACKEND_URL}/api/webhooks/github`,
+          url: webhookUrl,
           content_type: "json",
           secret: env.GITHUB_WEBHOOK_SECRET,
           insecure_ssl: "0",
