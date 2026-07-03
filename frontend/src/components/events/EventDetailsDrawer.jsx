@@ -63,7 +63,7 @@ export function EventDetailsDrawer({ event, open, onOpenChange }) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-lg">
+      <SheetContent side="right" className="w-full sm:max-w-lg px-6">
         <SheetHeader>
           <SheetTitle>Event Details</SheetTitle>
           <SheetDescription>

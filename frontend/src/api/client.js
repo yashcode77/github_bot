@@ -10,9 +10,47 @@ const apiClient = axios.create({
   },
 });
 
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+function subscribeTokenRefresh(callback) {
+  refreshSubscribers.push(callback);
+}
+
+function onTokenRefreshed(accessToken) {
+  refreshSubscribers.forEach((callback) => callback(accessToken));
+  refreshSubscribers = [];
+}
+
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          subscribeTokenRefresh((token) => {
+            resolve(apiClient(originalRequest));
+          });
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        await apiClient.post("/auth/refresh");
+        onTokenRefreshed();
+        return apiClient(originalRequest);
+      } catch (refreshError) {
+        refreshSubscribers = [];
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
     const message =
       error.response?.data?.error?.message ??
       error.message ??

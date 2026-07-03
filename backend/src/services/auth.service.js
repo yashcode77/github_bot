@@ -2,6 +2,7 @@ import { encryptToken, generateRefreshToken, hashRefreshToken } from "../lib/cry
 import { signAccessToken } from "../lib/jwt.js";
 import { env } from "../config/env.js";
 import { refreshTokenRepository, userRepository } from "../repositories/index.js";
+import { UnauthorizedError } from "../lib/errors.js";
 
 function refreshTokenExpiresAt() {
   return new Date(
@@ -77,5 +78,27 @@ export const authService = {
     if (refreshToken) {
       await this.revokeRefreshToken(refreshToken);
     }
+  },
+
+  async refreshAccessToken(refreshToken) {
+    const tokenHash = hashRefreshToken(refreshToken);
+    const storedToken = await refreshTokenRepository.findValidByHash(tokenHash);
+
+    if (!storedToken) {
+      throw new UnauthorizedError("Invalid or expired refresh token");
+    }
+
+    const accessToken = signAccessToken(storedToken.userId);
+    const newRefreshToken = generateRefreshToken();
+    const newTokenHash = hashRefreshToken(newRefreshToken);
+
+    await refreshTokenRepository.revoke(storedToken.id);
+    await refreshTokenRepository.create({
+      userId: storedToken.userId,
+      tokenHash: newTokenHash,
+      expiresAt: refreshTokenExpiresAt(),
+    });
+
+    return { accessToken, refreshToken: newRefreshToken };
   },
 };

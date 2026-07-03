@@ -67,4 +67,20 @@ export const authController = {
       next(error);
     }
   },
+
+  async refresh(req, res, next) {
+    try {
+      const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE];
+
+      if (!refreshToken) {
+        throw new UnauthorizedError("Refresh token not found");
+      }
+
+      const tokens = await authService.refreshAccessToken(refreshToken);
+      setAuthCookies(res, tokens);
+      res.json({ success: true });
+    } catch (error) {
+      next(error);
+    }
+  },
 };

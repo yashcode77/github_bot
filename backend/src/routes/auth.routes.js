@@ -8,5 +8,6 @@ router.get("/github", authController.githubLogin);
 router.get("/github/callback", authController.githubCallback);
 router.post("/logout", authController.logout);
 router.get("/me", requireAuth, authController.getCurrentUser);
+router.post("/refresh", authController.refresh);
 
 export default router;
