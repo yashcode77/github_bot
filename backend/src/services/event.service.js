@@ -1,5 +1,6 @@
 import { logger } from "../config/logger.js";
 import { githubEventRepository } from "../repositories/index.js";
+import { ruleService } from "./rule.service.js";
 
 const SUPPORTED_EVENTS = new Set([
   "issues:opened",
@@ -30,6 +31,8 @@ async function handleSupportedEvent(event) {
     },
     "Processing supported GitHub event",
   );
+
+  await ruleService.evaluateAndExecute(event);
 }
 
 export const eventService = {

@@ -138,4 +138,26 @@ export const githubService = {
       method: "DELETE",
     });
   },
+
+  async addLabel(accessToken, owner, name, issueNumber, label) {
+    return githubRequest(
+      `/repos/${owner}/${name}/issues/${issueNumber}/labels`,
+      accessToken,
+      {
+        method: "POST",
+        body: JSON.stringify({ labels: [label] }),
+      },
+    );
+  },
+
+  async addComment(accessToken, owner, name, issueNumber, body) {
+    return githubRequest(
+      `/repos/${owner}/${name}/issues/${issueNumber}/comments`,
+      accessToken,
+      {
+        method: "POST",
+        body: JSON.stringify({ body }),
+      },
+    );
+  },
 };

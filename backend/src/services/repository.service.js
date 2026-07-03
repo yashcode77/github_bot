@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { decryptToken } from "../lib/crypto.js";
 import {
   ConflictError,
   ForbiddenError,
   GitHubApiError,
   NotFoundError,
 } from "../lib/errors.js";
+import { getUserAccessToken } from "../lib/token.js";
 import { validate } from "../lib/validation.js";
 import { logger } from "../config/logger.js";
 import { repositoryRepository, userRepository } from "../repositories/index.js";
@@ -29,16 +29,6 @@ function toPublicRepository(repository) {
     connectedAt: repository.connectedAt,
     disconnectedAt: repository.disconnectedAt,
   };
-}
-
-async function getUserAccessToken(userId) {
-  const user = await userRepository.findById(userId);
-
-  if (!user) {
-    throw new NotFoundError("User not found");
-  }
-
-  return decryptToken(user.encryptedToken, user.tokenIv);
 }
 
 async function verifyRepositoryOwnership(userId, owner, name, githubRepoId) {
