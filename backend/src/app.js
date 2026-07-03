@@ -9,6 +9,7 @@ import passport from "./config/passport.js";
 import authRoutes from "./routes/auth.routes.js";
 import repositoryRoutes from "./routes/repository.routes.js";
 import ruleRoutes from "./routes/rule.routes.js";
+import dashboardRoutes from "./routes/dashboard.routes.js";
 import webhookRoutes from "./routes/webhook.routes.js";
 import {
   errorHandler,
@@ -63,6 +64,7 @@ app.get("/health", (_req, res) => {
 app.use("/auth", authRoutes);
 app.use("/api/repositories", repositoryRoutes);
 app.use("/api/rules", ruleRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
