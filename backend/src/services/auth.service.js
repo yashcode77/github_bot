@@ -81,41 +81,28 @@ export const authService = {
   },
 
   async refreshAccessToken(refreshToken) {
-    console.log("=== AUTH SERVICE REFRESH ===");
-    console.log("refresh token exists:", !!refreshToken);
-  
     const tokenHash = hashRefreshToken(refreshToken);
-  
-    console.log("token hash generated");
-  
     const storedToken =
       await refreshTokenRepository.findValidByHash(tokenHash);
-  
-    console.log("stored token found:", !!storedToken);
-  
-    if (storedToken) {
-      console.log("stored token userId:", storedToken.userId);
-      console.log("stored token id:", storedToken.id);
-    }
-  
+
     if (!storedToken) {
       throw new UnauthorizedError(
         "Invalid or expired refresh token"
       );
     }
-  
+
     const accessToken = signAccessToken(storedToken.userId);
     const newRefreshToken = generateRefreshToken();
     const newTokenHash = hashRefreshToken(newRefreshToken);
-  
+
     await refreshTokenRepository.revoke(storedToken.id);
-  
+
     await refreshTokenRepository.create({
       userId: storedToken.userId,
       tokenHash: newTokenHash,
       expiresAt: refreshTokenExpiresAt(),
     });
-  
+
     return {
       accessToken,
       refreshToken: newRefreshToken,

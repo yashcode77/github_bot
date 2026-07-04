@@ -41,13 +41,6 @@ app.use("/api/webhooks", webhookRoutes);
 
 app.use(express.json());
 
-app.use((req, res, next) => {
-  console.log("=== RAW COOKIE HEADER ===");
-  console.log(req.headers.cookie);
-  next();
-});
-
-app.use(cookieParser());
 app.use(cookieParser());
 
 app.use(
