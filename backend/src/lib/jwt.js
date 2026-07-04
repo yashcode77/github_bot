@@ -15,5 +15,5 @@ export function verifyAccessToken(token) {
     !!env.JWT_SECRET
   );
 
-  return jwt.verify(token, env.JWT_ACCESS_SECRET);
+  return jwt.verify(token, env.JWT_SECRET);
 }
