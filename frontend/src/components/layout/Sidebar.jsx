@@ -17,7 +17,7 @@ const navItems = [
   { to: "/rules", label: "Rules", icon: ListChecks },
   { to: "/events", label: "Events", icon: Activity },
   { to: "/actions", label: "Actions", icon: Zap },
-  { to: "/settings", label: "Settings", icon: Settings },
+  { to: "/settings", label: "Slack Settings", icon: Settings },
 ];
 
 export function Sidebar({ onNavigate }) {
