@@ -50,7 +50,13 @@ export function RuleForm({
               onValueChange={(value) => handleChange("repositoryId", value)}
             >
               <SelectTrigger id="repository" className="w-full">
-                <SelectValue placeholder="Select repository" className="truncate" />
+                <SelectValue placeholder="Select repository">
+                  {values.repositoryId && (
+                    <span className="truncate">
+                      {repositories.find((r) => String(r.id) === values.repositoryId)?.fullName}
+                    </span>
+                  )}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {repositories.map((repository) => (

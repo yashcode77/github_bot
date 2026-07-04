@@ -51,14 +51,24 @@ export function ActionFilters({
             value={repositoryFilter}
             onValueChange={onRepositoryFilterChange}
           >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="All Repositories" />
+            <SelectTrigger className="w-[250px]">
+              <SelectValue placeholder="All Repositories">
+                {repositoryFilter ? (
+                  <span className="truncate">
+                    {repositories.find((r) => r.id === repositoryFilter)?.fullName}
+                  </span>
+                ) : (
+                  <span>All Repositories</span>
+                )}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All Repositories</SelectItem>
               {repositories.map((repo) => (
-                <SelectItem key={repo.id} value={repo.id}>
-                  {repo.fullName}
+                <SelectItem key={repo.id} value={repo.id} className="max-w-[400px]">
+                  <span className="truncate block" title={repo.fullName}>
+                    {repo.fullName}
+                  </span>
                 </SelectItem>
               ))}
             </SelectContent>
