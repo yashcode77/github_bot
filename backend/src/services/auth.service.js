@@ -104,6 +104,21 @@ export const authService = {
       );
     }
   
-    // rest unchanged
+    const accessToken = signAccessToken(storedToken.userId);
+    const newRefreshToken = generateRefreshToken();
+    const newTokenHash = hashRefreshToken(newRefreshToken);
+  
+    await refreshTokenRepository.revoke(storedToken.id);
+  
+    await refreshTokenRepository.create({
+      userId: storedToken.userId,
+      tokenHash: newTokenHash,
+      expiresAt: refreshTokenExpiresAt(),
+    });
+  
+    return {
+      accessToken,
+      refreshToken: newRefreshToken,
+    };
   }
 };

@@ -81,8 +81,10 @@ export const authController = {
       console.log("calling authService.refreshAccessToken");
   
       const tokens = await authService.refreshAccessToken(refreshToken);
+      
   
       console.log("tokens generated successfully");
+      console.log("TOKENS:", tokens);
   
       setAuthCookies(res, tokens);
   
