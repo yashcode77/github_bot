@@ -8,5 +8,12 @@ export function signAccessToken(userId) {
 }
 
 export function verifyAccessToken(token) {
-  return jwt.verify(token, env.JWT_SECRET);
+  console.log("=== VERIFY ACCESS TOKEN ===");
+  console.log("token exists:", !!token);
+  console.log(
+    "JWT_ACCESS_SECRET exists:",
+    !!env.JWT_ACCESS_SECRET
+  );
+
+  return jwt.verify(token, env.JWT_ACCESS_SECRET);
 }
