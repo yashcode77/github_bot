@@ -10,7 +10,19 @@ export function notFoundHandler(_req, res) {
   });
 }
 
-export function errorHandler(err, _req, res, _next) {
+export function errorHandler(err, req, res, _next) {
+  console.error("=================================");
+  console.error("UNHANDLED ERROR");
+  console.error("Route:", req.method, req.originalUrl);
+  console.error("UserId:", req.userId);
+  console.error("Error Name:", err.name);
+  console.error("Error Message:", err.message);
+  console.error("Stack:");
+  console.error(err.stack);
+  console.error("Full Error:");
+  console.error(err);
+  console.error("=================================");
+
   if (err instanceof AppError) {
     const body = {
       error: {
