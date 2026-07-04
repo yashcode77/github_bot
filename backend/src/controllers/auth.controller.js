@@ -1,5 +1,6 @@
 import passport from "../config/passport.js";
 import { env } from "../config/env.js";
+import { logger } from "../config/logger.js";
 import { authService, toPublicUser } from "../services/auth.service.js";
 import { userRepository } from "../repositories/index.js";
 import {
@@ -11,34 +12,29 @@ import { NotFoundError } from "../lib/errors.js";
 
 export const authController = {
   githubLogin(req, res, next) {
-    console.log('GitHub login initiated');
     passport.authenticate("github")(req, res, next);
   },
 
   async githubCallback(req, res, next) {
-    console.log('GitHub callback received');
     passport.authenticate("github", { session: false }, async (err, user) => {
-      console.log('GitHub auth result - err:', err, 'user:', user);
       if (err) {
-        console.log('GitHub auth error, redirecting to login with error');
+        logger.warn("GitHub authentication failed");
         res.redirect(`${env.FRONTEND_URL}/login?error=auth_failed`);
         return;
       }
 
       if (!user) {
-        console.log('No user from GitHub auth, redirecting to login with error');
+        logger.warn("GitHub authentication returned no user");
         res.redirect(`${env.FRONTEND_URL}/login?error=auth_failed`);
         return;
       }
 
       try {
-        console.log('Issuing tokens for user:', user.id);
         const tokens = await authService.issueTokens(user.id);
         setAuthCookies(res, tokens);
-        console.log('Redirecting to dashboard');
         res.redirect(`${env.FRONTEND_URL}/dashboard`);
       } catch (error) {
-        console.log('Error issuing tokens:', error);
+        logger.error({ err: error }, "Failed to issue tokens");
         next(error);
       }
     })(req, res, next);
