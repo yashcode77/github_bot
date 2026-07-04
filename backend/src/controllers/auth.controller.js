@@ -9,6 +9,7 @@ import {
   setAuthCookies,
 } from "../lib/cookies.js";
 import { NotFoundError } from "../lib/errors.js";
+import { UnauthorizedError } from "../lib/errors.js";
 
 export const authController = {
   githubLogin(req, res, next) {
